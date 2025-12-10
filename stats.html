@@ -66,6 +66,17 @@
       <div class="meta" id="meta">加载中...</div>
     </div>
 
+    <!-- 日期筛选 -->
+    <div class="card" style="margin-bottom: 16px;">
+      <h3>日期筛选</h3>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+        <label>开始日期：<input type="date" id="startDate"></label>
+        <label>结束日期：<input type="date" id="endDate"></label>
+        <button id="filterBtn" style="padding: 6px 16px; background: var(--primary); color: #fff; border: none; border-radius: 4px; cursor: pointer;">筛选</button>
+        <button id="resetBtn" style="padding: 6px 16px; background: #888; color: #fff; border: none; border-radius: 4px; cursor: pointer;">重置</button>
+      </div>
+    </div>
+
     <div class="grid columns-4" id="demographics"></div>
 
     <div class="grid columns-2" style="margin-top: 16px;">
@@ -85,6 +96,19 @@
         <ul class="suggestions" id="suggestions"></ul>
       </div>
     </div>
+
+    <!-- 提交记录列表（时间+IP） -->
+    <div class="card" style="margin-top: 16px;">
+      <h3>提交记录</h3>
+      <div class="table-wrapper">
+        <table id="submissions-table">
+          <thead>
+            <tr><th>提交时间</th><th>IP 地址</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -95,10 +119,19 @@
       tech: '数智技术使用频率',
     };
 
+    let currentStartDate = '';
+    let currentEndDate = '';
+
     async function loadStats() {
       const metaEl = document.getElementById('meta');
       try {
-        const resp = await fetch('/api/stats');
+        let url = '/api/stats';
+        const params = new URLSearchParams();
+        if (currentStartDate) params.set('startDate', currentStartDate);
+        if (currentEndDate) params.set('endDate', currentEndDate);
+        if (params.toString()) url += '?' + params.toString();
+
+        const resp = await fetch(url);
         if (!resp.ok) throw new Error('无法获取统计数据');
         const data = await resp.json();
         renderStats(data);
@@ -115,6 +148,7 @@
       renderDemographics(data.demographics);
       renderLikert(data.likertStats);
       renderSuggestions(data.suggestions);
+      renderSubmissions(data.submissions);
     }
 
     function renderDemographics(demo) {
@@ -169,6 +203,35 @@
       if (Number.isNaN(d.getTime())) return str;
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
     }
+
+    function renderSubmissions(submissions) {
+      const tbody = document.querySelector('#submissions-table tbody');
+      tbody.innerHTML = '';
+      if (!submissions || !submissions.length) {
+        tbody.innerHTML = '<tr><td colspan="2" class="empty">暂无记录</td></tr>';
+        return;
+      }
+      submissions.forEach((s) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${formatTime(s.submittedAt)}</td><td>${s.ip}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 日期筛选事件
+    document.getElementById('filterBtn').addEventListener('click', () => {
+      currentStartDate = document.getElementById('startDate').value;
+      currentEndDate = document.getElementById('endDate').value;
+      loadStats();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('startDate').value = '';
+      document.getElementById('endDate').value = '';
+      currentStartDate = '';
+      currentEndDate = '';
+      loadStats();
+    });
 
     loadStats();
     setInterval(loadStats, 15000); // 每 15 秒刷新一次

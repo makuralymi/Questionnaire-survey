@@ -15,6 +15,16 @@ const LIKERT_IDS = [
 ];
 
 surveyApp.use(express.json({ limit: '1mb' }));
+
+// 获取客户端真实 IP（支持代理）
+function getClientIp(req) {
+  return req.headers['x-forwarded-for']?.split(',')[0].trim()
+    || req.headers['x-real-ip']
+    || req.socket?.remoteAddress
+    || req.ip
+    || 'unknown';
+}
+
 surveyApp.use(express.static(__dirname));
 
 // 统计端服务
@@ -148,6 +158,7 @@ surveyApp.post('/api/surveys', async (req, res) => {
 
   const record = {
     ...payload,
+    ip: getClientIp(req),
     submittedAt: new Date().toISOString(),
   };
 
@@ -163,14 +174,33 @@ surveyApp.post('/api/surveys', async (req, res) => {
   }
 });
 
-// 统计接口仅在 1145 暴露
-statsApp.get('/api/stats', async (_req, res) => {
+// 统计接口仅在 1145 暴露，支持 startDate/endDate 筛选
+statsApp.get('/api/stats', async (req, res) => {
   try {
-    if (!cachedStats) {
-      const all = await readAll();
-      cachedStats = buildStats(all);
+    const { startDate, endDate } = req.query;
+    let all = await readAll();
+
+    // 日期筛选
+    if (startDate || endDate) {
+      const start = startDate ? new Date(startDate + 'T00:00:00') : null;
+      const end = endDate ? new Date(endDate + 'T23:59:59') : null;
+      all = all.filter((r) => {
+        const t = new Date(r.submittedAt);
+        if (start && t < start) return false;
+        if (end && t > end) return false;
+        return true;
+      });
     }
-    return res.json(cachedStats);
+
+    const stats = (startDate || endDate) ? buildStats(all) : (cachedStats || buildStats(all));
+
+    // 返回提交列表（仅时间和IP）
+    const submissions = all.map((r) => ({
+      submittedAt: r.submittedAt,
+      ip: r.ip || 'unknown',
+    })).reverse().slice(0, 100);
+
+    return res.json({ ...stats, submissions });
   } catch (err) {
     console.error('统计失败', err);
     return res.status(500).json({ message: '统计生成失败' });
