@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>浙江省博物馆AR导览系统体验调查</title>
+    <style>
+        :root {
+            --primary-color: #2c5f2d; /* 博物馆绿 */
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --text-light: #666;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .intro {
+            font-size: 14px;
+            color: var(--text-light);
+            text-align: justify;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .section-title {
+            background-color: #eef5ef;
+            color: var(--primary-color);
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .question-block {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .question-label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* 选项样式 */
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .radio-label:hover {
+            background-color: #f0f0f0;
+        }
+
+        input[type="radio"] {
+            margin-right: 10px;
+            accent-color: var(--primary-color);
+            transform: scale(1.2);
+        }
+
+        /* 李克特量表样式 (1-5分) */
+        .likert-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding: 0 10px;
+        }
+
+        .likert-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            width: 18%;
+        }
+
+        .likert-num {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+
+        .likert-desc {
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #1e4220;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .likert-desc { display: none; } /* 手机上隐藏文字描述，只显示数字 */
+            .likert-option:first-child .likert-desc, 
+            .likert-option:last-child .likert-desc { display: block; } /* 只显示首尾描述 */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>浙江省博物馆AR导览系统<br>游客满意度调查</h1>
+    
+    <div class="intro">
+        <p>尊敬的游客朋友：您好！本问卷旨在了解您在浙江省博物馆使用AR（增强现实）导览系统的真实体验。本问卷实行匿名制，所有数据仅用于学术毕业论文分析，请您根据真实感受放心填写。</p>
+    </div>
+
+    <form id="surveyForm">
+
+        <div class="section-title">第一部分：基本资料</div>
+
+        <div class="question-block">
+            <label class="question-label">1. 您的性别</label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="gender" value="男" required> 男</label>
+                <label class="radio-label"><input type="radio" name="gender" value="女"> 女</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <label class="question-label">2. 您的年龄</label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="age" value="18岁以下" required> 18岁以下</label>
+                <label class="radio-label"><input type="radio" name="age" value="18-25岁"> 18-25岁</label>
+                <label class="radio-label"><input type="radio" name="age" value="26-40岁"> 26-40岁</label>
+                <label class="radio-label"><input type="radio" name="age" value="41-60岁"> 41-60岁</label>
+                <label class="radio-label"><input type="radio" name="age" value="60岁以上"> 60岁以上</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <label class="question-label">3. 您的受教育程度</label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="edu" value="高中及以下" required> 高中及以下</label>
+                <label class="radio-label"><input type="radio" name="edu" value="大专"> 大专</label>
+                <label class="radio-label"><input type="radio" name="edu" value="本科"> 本科</label>
+                <label class="radio-label"><input type="radio" name="edu" value="硕士及以上"> 硕士及以上</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <label class="question-label">4. 您使用AR/VR等数智技术的频率</label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="tech" value="几乎从不" required> 几乎从不</label>
+                <label class="radio-label"><input type="radio" name="tech" value="偶尔尝试"> 偶尔尝试</label>
+                <label class="radio-label"><input type="radio" name="tech" value="经常使用"> 经常使用</label>
+                <label class="radio-label"><input type="radio" name="tech" value="非常精通"> 非常精通</label>
+            </div>
+        </div>
+
+        <div class="section-title">第二部分：AR体验评分</div>
+        <p style="font-size: 12px; color: #666; text-align: center;">(1=非常不同意，3=一般，5=非常同意)</p>
+
+        <div id="likert-questions-container"></div>
+
+        <div class="section-title">第三部分：您的建议</div>
+        <div class="question-block">
+            <label class="question-label">您认为目前的AR导览系统还有哪些需要改进的地方？（选填）</label>
+            <textarea name="suggestion" placeholder="请输入您的宝贵建议..."></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">提交问卷</button>
+
+    </form>
+</div>
+
+<script>
+    // 定义核心量表题目
+    const likertQuestions = [
+        { id: "A1", text: "A1. AR导览提供的文物解说内容非常详尽、丰富。" },
+        { id: "A2", text: "A2. 相比传统文字牌，AR展示的信息让我更容易理解历史背景。" },
+        { id: "A3", text: "A3. 系统提供的信息准确无误，具有很高的知识价值。" },
+        { id: "A4", text: "A4. 我通过AR导览获取了许多如果不使用就无法得知的额外信息。" },
+        { id: "A5", text: "A5. 使用AR导览寻找和扫描文物的过程非常有趣。" },
+        { id: "A6", text: "A6. 系统中的3D动画或特效生动逼真，增加了参观的乐趣。" },
+        { id: "A7", text: "A7. 这种导览方式让我感到愉快和放松。" },
+        { id: "A8", text: "A8. 相比单纯看展品，AR互动让我的参观过程不再枯燥。" },
+        { id: "A9", text: "A9. 我可以自由控制AR导览的进度和展示内容。" },
+        { id: "A10", text: "A10. 系统对我发出的指令（如点击、缩放、扫描）反应非常迅速。" },
+        { id: "A11", text: "A11. 我感觉我是在与系统进行双向互动，而不是被动观看。" },
+        { id: "A12", text: "A12. 整个AR导览系统的界面设计清晰，图标含义一目了然。" },
+        { id: "A13", text: "A13. 即使没有工作人员指导，我也能很快学会如何使用它。" },
+        { id: "A14", text: "A14. 在使用过程中，系统运行稳定，很少出现卡顿或闪退。" },
+        { id: "A15", text: "A15. 使用该系统不需要花费我太多的精力和脑力。" },
+        
+        { id: "B1", text: "B1. 通过AR体验，我对浙江省博物馆的藏品印象更加深刻了。" },
+        { id: "B2", text: "B2. 这次体验激发了我对相关历史文化的探索兴趣。" },
+        { id: "B3", text: "B3. 我觉得自己在这个过程中学到了很多新知识。" },
+        { id: "B4", text: "B4. 在使用AR时，我仿佛身临其境，穿越到了历史场景中。" },
+        { id: "B5", text: "B5. 我的注意力完全被AR内容吸引，忘记了周围的嘈杂。" },
+        { id: "B6", text: "B6. 虚拟内容与现实文物的融合非常自然，让我感到很投入。" },
+        { id: "B7", text: "B7. 因为这次独特的AR体验，我对浙江省博物馆产生了好感。" },
+        { id: "B8", text: "B8. 我觉得浙江省博物馆是一个有温度、有情感的地方。" },
+        { id: "B9", text: "B9. 这里的数字化体验让我对这个博物馆产生了一种特殊的认同感。" },
+        
+        { id: "C1", text: "C1. 总体而言，我对这次AR导览体验感到非常满意。" },
+        { id: "C2", text: "C2. 这次体验完全达到了（甚至超过了）我对智慧导览的预期。" },
+        { id: "C3", text: "C3. 我认为花费时间和精力使用这个系统是值得的。" },
+        { id: "C4", text: "C4. 未来如果再来博物馆，我还会愿意使用AR导览系统。" },
+        { id: "C5", text: "C5. 我会向我的亲戚、朋友推荐浙江省博物馆的AR导览体验。" },
+        { id: "C6", text: "C6. 我愿意在社交媒体（如微信、小红书）上分享这次有趣的AR体验。" }
+    ];
+
+    // 动态生成量表HTML
+    const container = document.getElementById('likert-questions-container');
+    likertQuestions.forEach(q => {
+        const div = document.createElement('div');
+        div.className = 'question-block';
+        div.innerHTML = `
+            <label class="question-label">${q.text}</label>
+            <div class="likert-scale">
+                <label class="likert-option">
+                    <span class="likert-num">1</span>
+                    <input type="radio" name="${q.id}" value="1" required>
+                    <span class="likert-desc">非常不同意</span>
+                </label>
+                <label class="likert-option">
+                    <span class="likert-num">2</span>
+                    <input type="radio" name="${q.id}" value="2">
+                    <span class="likert-desc">不同意</span>
+                </label>
+                <label class="likert-option">
+                    <span class="likert-num">3</span>
+                    <input type="radio" name="${q.id}" value="3">
+                    <span class="likert-desc">一般</span>
+                </label>
+                <label class="likert-option">
+                    <span class="likert-num">4</span>
+                    <input type="radio" name="${q.id}" value="4">
+                    <span class="likert-desc">同意</span>
+                </label>
+                <label class="likert-option">
+                    <span class="likert-num">5</span>
+                    <input type="radio" name="${q.id}" value="5">
+                    <span class="likert-desc">非常同意</span>
+                </label>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    // 表单提交处理：将数据发送到后端接口
+    document.getElementById('surveyForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const data = {};
+        for (const [key, value] of formData.entries()) {
+            data[key] = value;
+        }
+
+        // 将量表项转成数字便于后端统计
+        likertQuestions.forEach(q => {
+            if (data[q.id]) {
+                data[q.id] = Number(data[q.id]);
+            }
+        });
+
+        try {
+            const resp = await fetch('/api/surveys', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const payload = await resp.json().catch(() => ({}));
+            if (!resp.ok) {
+                const msg = payload.message || '提交失败，请稍后重试';
+                const detail = Array.isArray(payload.errors) ? `：${payload.errors.join('；')}` : '';
+                throw new Error(msg + detail);
+            }
+
+            alert('✨ 问卷提交成功，感谢您的参与！');
+            this.reset();
+        } catch (err) {
+            console.error(err);
+            alert('提交失败：' + err.message);
+        }
+    });
+</script>
+
+</body>
+</html>

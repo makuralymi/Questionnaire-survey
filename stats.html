@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>问卷统计面板</title>
+  <style>
+    :root {
+      --primary: #2c5f2d;
+      --bg: #f4f7f6;
+      --card: #fff;
+      --text: #333;
+      --muted: #666;
+      --radius: 10px;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: radial-gradient(circle at 10% 20%, rgba(44,95,45,0.05), transparent 30%),
+                  radial-gradient(circle at 90% 0%, rgba(44,95,45,0.08), transparent 35%),
+                  var(--bg);
+      color: var(--text);
+      padding: 20px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header {
+      display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;
+      gap: 12px; margin-bottom: 16px;
+    }
+    h1 { margin: 0; color: var(--primary); }
+    .meta { color: var(--muted); font-size: 14px; }
+    .grid { display: grid; gap: 16px; }
+    .grid.columns-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+    .grid.columns-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .card h3 { margin: 0 0 8px 0; color: var(--primary); }
+    .stat { display: flex; justify-content: space-between; align-items: center; margin: 6px 0; }
+    .stat .label { color: var(--muted); }
+    .stat .value { font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #eef5ef; color: var(--primary); }
+    .pill {
+      display: inline-block; padding: 2px 8px; background: #eef5ef; color: var(--primary);
+      border-radius: 999px; font-size: 12px; margin-left: 6px;
+    }
+    .suggestions { list-style: none; padding: 0; margin: 0; }
+    .suggestions li { padding: 8px 0; border-bottom: 1px dashed #e0e0e0; color: #444; }
+    .empty { color: var(--muted); font-size: 14px; }
+    .error { color: #b00020; }
+    @media (max-width: 768px) {
+      .header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>浙江省博物馆 AR 导览问卷 · 统计面板</h1>
+      <div class="meta" id="meta">加载中...</div>
+    </div>
+
+    <div class="grid columns-4" id="demographics"></div>
+
+    <div class="grid columns-2" style="margin-top: 16px;">
+      <div class="card">
+        <h3>量表均值（1-5）</h3>
+        <div class="table-wrapper">
+          <table id="likert-table">
+            <thead>
+              <tr><th>题目</th><th>均值</th><th>样本量</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <h3>最新建议</h3>
+        <ul class="suggestions" id="suggestions"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const demoTitles = {
+      gender: '性别分布',
+      age: '年龄分布',
+      edu: '受教育程度',
+      tech: '数智技术使用频率',
+    };
+
+    async function loadStats() {
+      const metaEl = document.getElementById('meta');
+      try {
+        const resp = await fetch('/api/stats');
+        if (!resp.ok) throw new Error('无法获取统计数据');
+        const data = await resp.json();
+        renderStats(data);
+        metaEl.textContent = '';
+      } catch (err) {
+        metaEl.textContent = '加载失败：' + err.message;
+        metaEl.classList.add('error');
+      }
+    }
+
+    function renderStats(data) {
+      const metaEl = document.getElementById('meta');
+      metaEl.textContent = `样本量：${data.count} · 更新于 ${formatTime(data.lastUpdated)}`;
+      renderDemographics(data.demographics);
+      renderLikert(data.likertStats);
+      renderSuggestions(data.suggestions);
+    }
+
+    function renderDemographics(demo) {
+      const container = document.getElementById('demographics');
+      container.innerHTML = '';
+      Object.entries(demoTitles).forEach(([key, title]) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const stats = demo[key] || {};
+        card.innerHTML = `<h3>${title}</h3>` +
+          Object.keys(stats).map(k => {
+            const val = stats[k];
+            return `<div class="stat"><span class="label">${k}</span><span class="value">${val}</span></div>`;
+          }).join('') || '<div class="empty">暂无数据</div>';
+        container.appendChild(card);
+      });
+    }
+
+    function renderLikert(stats) {
+      const tbody = document.querySelector('#likert-table tbody');
+      tbody.innerHTML = '';
+      Object.entries(stats).forEach(([id, obj]) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${id}</td>
+          <td>${obj.average !== null ? obj.average.toFixed(2) : '-'}
+            ${obj.average !== null ? `<span class="pill">评分</span>` : ''}
+          </td>
+          <td>${obj.answered}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderSuggestions(s) {
+      const list = document.getElementById('suggestions');
+      list.innerHTML = '';
+      if (!s || !s.latest || !s.latest.length) {
+        list.innerHTML = '<li class="empty">暂无建议</li>';
+        return;
+      }
+      s.latest.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        list.appendChild(li);
+      });
+    }
+
+    function formatTime(str) {
+      if (!str) return '-';
+      const d = new Date(str);
+      if (Number.isNaN(d.getTime())) return str;
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    }
+
+    loadStats();
+    setInterval(loadStats, 15000); // 每 15 秒刷新一次
+  </script>
+</body>
+</html>

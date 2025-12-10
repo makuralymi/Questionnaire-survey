@@ -1,0 +1,12 @@
+{
+  "name": "museum-ar-survey-backend",
+  "version": "0.1.0",
+  "description": "Backend for Zhejiang Museum AR survey data collection",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
