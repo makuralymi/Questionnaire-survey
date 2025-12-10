@@ -20,6 +20,25 @@ surveyApp.use(express.static(__dirname));
 // 统计端服务
 statsApp.use(express.json({ limit: '1mb' }));
 
+// 简单的 Basic Auth 中间件
+const basicAuth = (req, res, next) => {
+  const auth = req.headers['authorization'];
+  if (!auth || !auth.startsWith('Basic ')) {
+    res.set('WWW-Authenticate', 'Basic realm="Stats Dashboard"');
+    return res.status(401).send('需要登录');
+  }
+  const base64 = auth.split(' ')[1];
+  const [user, pass] = Buffer.from(base64, 'base64').toString().split(':');
+  if (user === 'makuraly' && pass === 'Lxy20040904.com') {
+    return next();
+  }
+  res.set('WWW-Authenticate', 'Basic realm="Stats Dashboard"');
+  return res.status(401).send('认证失败');
+};
+
+// 统计端所有页面和接口都需登录
+statsApp.use(basicAuth);
+
 // 默认进入统计面板（必须在 static 之前定义，否则会被 index.html 拦截）
 statsApp.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, 'stats.html'));
