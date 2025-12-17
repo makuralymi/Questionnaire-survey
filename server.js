@@ -124,12 +124,6 @@ function buildStats(records) {
     return acc;
   }, {});
 
-  const suggestions = records
-    .map((r) => (r.suggestion || '').trim())
-    .filter(Boolean)
-    .slice(-20)
-    .reverse();
-
   return {
     count,
     demographics: {
@@ -139,10 +133,6 @@ function buildStats(records) {
       tech: tallyByField(records, 'tech'),
     },
     likertStats,
-    suggestions: {
-      count: suggestions.length,
-      latest: suggestions,
-    },
     lastUpdated: new Date().toISOString(),
   };
 }
@@ -204,6 +194,57 @@ statsApp.get('/api/stats', async (req, res) => {
   } catch (err) {
     console.error('统计失败', err);
     return res.status(500).json({ message: '统计生成失败' });
+  }
+});
+
+// 下载数据接口（支持 CSV 和 JSON 格式）
+statsApp.get('/api/download', async (req, res) => {
+  try {
+    const { format = 'csv', startDate, endDate } = req.query;
+    let all = await readAll();
+
+    // 日期筛选
+    if (startDate || endDate) {
+      const start = startDate ? new Date(startDate + 'T00:00:00') : null;
+      const end = endDate ? new Date(endDate + 'T23:59:59') : null;
+      all = all.filter((r) => {
+        const t = new Date(r.submittedAt);
+        if (start && t < start) return false;
+        if (end && t > end) return false;
+        return true;
+      });
+    }
+
+    const timestamp = new Date().toISOString().slice(0, 10);
+
+    if (format === 'json') {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="survey-data-${timestamp}.json"`);
+      return res.send(JSON.stringify(all, null, 2));
+    }
+
+    // CSV 格式
+    const headers = ['submittedAt', 'ip', 'gender', 'age', 'edu', 'tech', ...LIKERT_IDS];
+    const csvRows = [headers.join(',')];
+    all.forEach((r) => {
+      const row = headers.map((h) => {
+        const val = r[h] ?? '';
+        // 转义包含逗号或引号的值
+        if (typeof val === 'string' && (val.includes(',') || val.includes('"'))) {
+          return `"${val.replace(/"/g, '""')}"`;
+        }
+        return val;
+      });
+      csvRows.push(row.join(','));
+    });
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="survey-data-${timestamp}.csv"`);
+    // 添加 BOM 以支持 Excel 正确识别 UTF-8
+    return res.send('\uFEFF' + csvRows.join('\n'));
+  } catch (err) {
+    console.error('下载失败', err);
+    return res.status(500).json({ message: '下载失败' });
   }
 });
 

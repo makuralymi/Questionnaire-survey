@@ -61,6 +61,16 @@
             font-size: 18px;
         }
 
+        .sub-section-title {
+            color: var(--primary-color);
+            font-size: 16px;
+            font-weight: bold;
+            margin: 20px 0 15px 0;
+            padding: 8px 12px;
+            border-left: 4px solid var(--primary-color);
+            background: linear-gradient(90deg, rgba(44,95,45,0.1) 0%, transparent 100%);
+        }
+
         .question-block {
             margin-bottom: 25px;
             padding-bottom: 15px;
@@ -216,15 +226,9 @@
         </div>
 
         <div class="section-title">第二部分：AR体验评分</div>
-        <p style="font-size: 12px; color: #666; text-align: center;">(1=非常不同意，3=一般，5=非常同意)</p>
+        <p style="font-size: 12px; color: #666; text-align: center;">(5=非常同意，3=一般，1=非常不同意)</p>
 
         <div id="likert-questions-container"></div>
-
-        <div class="section-title">第三部分：您的建议</div>
-        <div class="question-block">
-            <label class="question-label">您认为目前的AR导览系统还有哪些需要改进的地方？（选填）</label>
-            <textarea name="suggestion" placeholder="请输入您的宝贵建议..."></textarea>
-        </div>
 
         <button type="submit" class="submit-btn">提交问卷</button>
 
@@ -270,26 +274,28 @@
 
     // 动态生成量表HTML
     const container = document.getElementById('likert-questions-container');
+    const subSectionTitles = {
+        'A1': 'A. AR导览系统',
+        'B1': 'B. 游客满意度',
+        'C1': 'C. 未来预期'
+    };
     likertQuestions.forEach(q => {
+        // 在A1、B1、C1之前插入副标题
+        if (subSectionTitles[q.id]) {
+            const subtitle = document.createElement('div');
+            subtitle.className = 'sub-section-title';
+            subtitle.textContent = subSectionTitles[q.id];
+            container.appendChild(subtitle);
+        }
         const div = document.createElement('div');
         div.className = 'question-block';
         div.innerHTML = `
             <label class="question-label">${q.text}</label>
             <div class="likert-scale">
                 <label class="likert-option">
-                    <span class="likert-num">1</span>
-                    <input type="radio" name="${q.id}" value="1" required>
-                    <span class="likert-desc">非常不同意</span>
-                </label>
-                <label class="likert-option">
-                    <span class="likert-num">2</span>
-                    <input type="radio" name="${q.id}" value="2">
-                    <span class="likert-desc">不同意</span>
-                </label>
-                <label class="likert-option">
-                    <span class="likert-num">3</span>
-                    <input type="radio" name="${q.id}" value="3">
-                    <span class="likert-desc">一般</span>
+                    <span class="likert-num">5</span>
+                    <input type="radio" name="${q.id}" value="5" required>
+                    <span class="likert-desc">非常同意</span>
                 </label>
                 <label class="likert-option">
                     <span class="likert-num">4</span>
@@ -297,9 +303,19 @@
                     <span class="likert-desc">同意</span>
                 </label>
                 <label class="likert-option">
-                    <span class="likert-num">5</span>
-                    <input type="radio" name="${q.id}" value="5">
-                    <span class="likert-desc">非常同意</span>
+                    <span class="likert-num">3</span>
+                    <input type="radio" name="${q.id}" value="3">
+                    <span class="likert-desc">一般</span>
+                </label>
+                <label class="likert-option">
+                    <span class="likert-num">2</span>
+                    <input type="radio" name="${q.id}" value="2">
+                    <span class="likert-desc">不同意</span>
+                </label>
+                <label class="likert-option">
+                    <span class="likert-num">1</span>
+                    <input type="radio" name="${q.id}" value="1">
+                    <span class="likert-desc">非常不同意</span>
                 </label>
             </div>
         `;
