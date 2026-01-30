@@ -3,85 +3,243 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>问卷统计面板</title>
+  <title>问卷统计面板 - 滁州市博物馆</title>
   <style>
-    :root {
-      --primary: #2c5f2d;
-      --bg: #f4f7f6;
-      --card: #fff;
-      --text: #333;
-      --muted: #666;
-      --radius: 10px;
-      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+    :root{
+      --bg1:#0b1220;
+      --bg2:#0a1a2e;
+      --card:#0f213a;
+      --card2:#0d1c33;
+      --text:#eaf1ff;
+      --muted:#b9c7e6;
+      --line:rgba(255,255,255,.10);
+      --accent:#7dd3fc;
+      --accent2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 18px 45px rgba(0,0,0,.35);
+      --radius: 18px;
+      --focus: 0 0 0 4px rgba(125, 211, 252, .25);
+      --font: ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", Arial;
     }
+    * { box-sizing:border-box; }
+    html, body { height:100%; }
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: radial-gradient(circle at 10% 20%, rgba(44,95,45,0.05), transparent 30%),
-                  radial-gradient(circle at 90% 0%, rgba(44,95,45,0.08), transparent 35%),
-                  var(--bg);
+      font-family: var(--font);
       color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 15% 10%, rgba(167,139,250,.35), transparent 60%),
+        radial-gradient(900px 520px at 85% 15%, rgba(125,211,252,.28), transparent 55%),
+        radial-gradient(900px 700px at 50% 95%, rgba(52,211,153,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      padding: 28px 16px 44px;
+      min-height: 100vh;
+    }
+    .container { max-width: 1280px; margin: 0 auto; }
+    
+    .header {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 22px 22px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .header:before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background:
+        radial-gradient(500px 200px at 0% 0%, rgba(125,211,252,.22), transparent 65%),
+        radial-gradient(520px 220px at 100% 0%, rgba(167,139,250,.20), transparent 70%),
+        radial-gradient(520px 220px at 60% 120%, rgba(52,211,153,.10), transparent 65%);
+      pointer-events: none;
+      filter: blur(2px);
+      opacity: .9;
+    }
+    .header > * { position: relative; }
+    h1 { margin: 0 0 6px; font-size: 24px; letter-spacing: .3px; }
+    .meta { color: var(--muted); font-size: 13.5px; line-height: 1.7; }
+    
+    .grid { display: grid; gap: 16px; margin-top: 16px; }
+    .grid.columns-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    
+    .card {
+      border: 1px solid var(--line);
+      background: rgba(15,33,58,.74);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      position: relative;
+    }
+    .card h3 { 
+      margin: 0 0 14px 0;
+      font-size: 16px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .stat { 
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(0,0,0,.15);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .stat .label { color: var(--muted); font-size: 13px; }
+    .stat .value { font-weight: 600; color: var(--accent); font-size: 14px; }
+    
+    table { 
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td { 
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      font-size: 13.5px;
+    }
+    th { 
+      background: rgba(0,0,0,.2);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    td { color: var(--text); }
+    tr:hover td {
+      background: rgba(125,211,252,.05);
+    }
+    .pill {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(125,211,252,.15);
+      color: var(--accent);
+      border-radius: 999px;
+      font-size: 11px;
+      margin-left: 6px;
+      border: 1px solid rgba(125,211,252,.25);
+    }
+    .empty { 
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
       padding: 20px;
     }
-    .container { max-width: 1200px; margin: 0 auto; }
-    .header {
-      display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;
-      gap: 12px; margin-bottom: 16px;
+    .error { color: var(--bad); }
+    
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
     }
-    h1 { margin: 0; color: var(--primary); }
-    .meta { color: var(--muted); font-size: 14px; }
-    .grid { display: grid; gap: 16px; }
-    .grid.columns-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-    .grid.columns-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow);
+    .filter-bar label {
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .card h3 { margin: 0 0 8px 0; color: var(--primary); }
-    .stat { display: flex; justify-content: space-between; align-items: center; margin: 6px 0; }
-    .stat .label { color: var(--muted); }
-    .stat .value { font-weight: 600; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
-    th { background: #eef5ef; color: var(--primary); }
-    .pill {
-      display: inline-block; padding: 2px 8px; background: #eef5ef; color: var(--primary);
-      border-radius: 999px; font-size: 12px; margin-left: 6px;
+    input[type="date"] {
+      background: rgba(0,0,0,.2);
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-family: var(--font);
+      font-size: 13px;
     }
-    .empty { color: var(--muted); font-size: 14px; }
-    .error { color: #b00020; }
+    input[type="date"]:focus {
+      outline: none;
+      box-shadow: var(--focus);
+      border-color: rgba(125,211,252,.35);
+    }
+    button {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+      transition: transform .06s ease, filter .18s ease, background .18s ease;
+    }
+    button:hover { filter: brightness(1.1); }
+    button:active { transform: translateY(1px); }
+    
+    #filterBtn {
+      background: linear-gradient(180deg, rgba(125,211,252,.22), rgba(125,211,252,.12));
+      border: 1px solid rgba(125,211,252,.30);
+    }
+    #resetBtn {
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+    #downloadCsvBtn {
+      background: linear-gradient(180deg, rgba(52,211,153,.20), rgba(52,211,153,.10));
+      border: 1px solid rgba(52,211,153,.30);
+      margin-left: auto;
+    }
+    #downloadJsonBtn {
+      background: linear-gradient(180deg, rgba(251,191,36,.20), rgba(251,191,36,.10));
+      border: 1px solid rgba(251,191,36,.30);
+    }
+    
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.15);
+    }
+    
     @media (max-width: 768px) {
-      .header { flex-direction: column; align-items: flex-start; }
+      .header { flex-direction: column; }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      button { width: 100%; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>浙江省博物馆 AR 导览问卷 · 统计面板</h1>
-      <div class="meta" id="meta">加载中...</div>
+      <div>
+        <h1>滁州市博物馆游客满意度调查 · 统计面板</h1>
+        <div class="meta" id="meta">加载中...</div>
+      </div>
     </div>
 
     <!-- 日期筛选 -->
-    <div class="card" style="margin-bottom: 16px;">
-      <h3>日期筛选</h3>
-      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+    <div class="card">
+      <h3>📅 日期筛选</h3>
+      <div class="filter-bar">
         <label>开始日期：<input type="date" id="startDate"></label>
         <label>结束日期：<input type="date" id="endDate"></label>
-        <button id="filterBtn" style="padding: 6px 16px; background: var(--primary); color: #fff; border: none; border-radius: 4px; cursor: pointer;">筛选</button>
-        <button id="resetBtn" style="padding: 6px 16px; background: #888; color: #fff; border: none; border-radius: 4px; cursor: pointer;">重置</button>
-        <span style="margin-left: auto;"></span>
-        <button id="downloadCsvBtn" style="padding: 6px 16px; background: #1976d2; color: #fff; border: none; border-radius: 4px; cursor: pointer;">📥 下载 CSV</button>
-        <button id="downloadJsonBtn" style="padding: 6px 16px; background: #ff9800; color: #fff; border: none; border-radius: 4px; cursor: pointer;">📥 下载 JSON</button>
+        <button id="filterBtn">筛选</button>
+        <button id="resetBtn">重置</button>
+        <button id="downloadCsvBtn">📥 下载 CSV</button>
+        <button id="downloadJsonBtn">📥 下载 JSON</button>
       </div>
     </div>
 
     <div class="grid columns-4" id="demographics"></div>
 
     <div class="card" style="margin-top: 16px;">
-      <h3>量表均值（1-5）</h3>
+      <h3>📊 满意度量表均值（1-5）</h3>
       <div class="table-wrapper">
         <table id="likert-table">
           <thead>
@@ -93,8 +251,8 @@
     </div>
 
     <!-- 提交记录列表（时间+IP） -->
-    <div class="card" style="margin-top: 16px;">
-      <h3>提交记录</h3>
+    <div class="card">
+      <h3>📝 提交记录</h3>
       <div class="table-wrapper">
         <table id="submissions-table">
           <thead>
@@ -109,9 +267,57 @@
   <script>
     const demoTitles = {
       gender: '性别分布',
+      residence: '常住地分布',
       age: '年龄分布',
-      edu: '受教育程度',
-      tech: '数智技术使用频率',
+      education: '受教育程度',
+      occupation: '职业分布',
+      income: '月收入分布',
+      visitCount: '参观次数',
+      purpose: '参观目的',
+    };
+
+    // 量表题目描述
+    const scaleTitles = {
+      // 有形性
+      'Q16': '馆内环境整洁与卫生',
+      'Q17': '展陈硬件条件',
+      'Q18': '温度通风舒适度',
+      'Q19': '休憩设施便利性',
+      'Q20': '无障碍与便民设施',
+      'Q21': '指示标识清晰度',
+      // 可靠性
+      'Q22': '开放时间与入馆规则',
+      'Q23': '展览信息准确完整',
+      'Q24': '预约入馆流程可靠性',
+      'Q25': '导览解说专业性',
+      'Q26': '文创商品信息透明度',
+      // 响应性
+      'Q27': '咨询引导响应速度',
+      'Q28': '排队疏导效率',
+      'Q29': '讲解服务获取便利性',
+      'Q30': '问题处理及时性',
+      'Q31': '线上信息服务响应',
+      // 保证性
+      'Q32': '服务态度礼貌规范',
+      'Q33': '业务能力专业水平',
+      'Q34': '馆内安全保障',
+      'Q35': '安全感与秩序感',
+      // 移情性
+      'Q36': '不同群体关怀程度',
+      'Q37': '以游客为中心体验',
+      'Q38': '参观动线人性化',
+      'Q39': '参观节奏空间体验',
+      // 文旅融合
+      'Q40': '地方文化特色体现',
+      'Q41': '互动与智慧化体验',
+      'Q42': '对外宣传信息触达',
+      'Q43': '社教活动体验',
+      'Q44': '文创产品吸引力',
+      // 总体
+      'Q45': '整体满意度',
+      // 行为意向
+      'Q46': '推荐意愿',
+      'Q47': '再次参观意愿',
     };
 
     let currentStartDate = '';
@@ -139,7 +345,7 @@
 
     function renderStats(data) {
       const metaEl = document.getElementById('meta');
-      metaEl.textContent = `样本量：${data.count} · 更新于 ${formatTime(data.lastUpdated)}`;
+      metaEl.textContent = `总提交：${data.count} · 有效问卷：${data.validCount || data.count} · 更新于 ${formatTime(data.lastUpdated)}`;
       renderDemographics(data.demographics);
       renderLikert(data.likertStats);
       renderSubmissions(data.submissions);
@@ -166,8 +372,9 @@
       tbody.innerHTML = '';
       Object.entries(stats).forEach(([id, obj]) => {
         const tr = document.createElement('tr');
+        const title = scaleTitles[id] || id;
         tr.innerHTML = `
-          <td>${id}</td>
+          <td>${id} - ${title}</td>
           <td>${obj.average !== null ? obj.average.toFixed(2) : '-'}
             ${obj.average !== null ? `<span class="pill">评分</span>` : ''}
           </td>

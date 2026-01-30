@@ -8,11 +8,23 @@ const statsApp = express();  // 端口 1145，用于统计查看
 const SURVEY_PORT = process.env.SURVEY_PORT || 1144;
 const STATS_PORT = process.env.STATS_PORT || 1145;
 const DATA_FILE = path.join(__dirname, 'data', 'responses.json');
+
+// 满意度量表题目ID（Q16-Q45）
 const LIKERT_IDS = [
-  'A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','A11','A12','A13','A14','A15',
-  'B1','B2','B3','B4','B5','B6','B7','B8','B9',
-  'C1','C2','C3','C4','C5','C6'
+  'Q16','Q17','Q18','Q19','Q20','Q21', // 有形性
+  'Q22','Q23','Q24','Q25','Q26',       // 可靠性
+  'Q27','Q28','Q29','Q30','Q31',       // 响应性
+  'Q32','Q33','Q34','Q35',             // 保证性
+  'Q36','Q37','Q38','Q39',             // 移情性
+  'Q40','Q41','Q42','Q43','Q44',       // 文旅融合体验
+  'Q45'                                 // 总体满意度
 ];
+
+// 行为意向题目ID（Q46-Q47）
+const INTENT_IDS = ['Q46', 'Q47'];
+
+// 所有量表题（用于统计）
+const ALL_SCALE_IDS = [...LIKERT_IDS, ...INTENT_IDS];
 
 surveyApp.use(express.json({ limit: '1mb' }));
 
@@ -67,16 +79,50 @@ async function ensureStore() {
 }
 
 function validatePayload(payload) {
-  const requiredFields = ['gender', 'age', 'edu', 'tech'];
   const errors = [];
 
-  requiredFields.forEach((field) => {
+  // 筛选题必填
+  if (!payload.Q1) {
+    errors.push('缺少筛选题 Q1');
+    return errors;
+  }
+
+  // 如果选择"否"（未参观），则只需要Q1
+  if (payload.Q1 === '否' || payload.filtered) {
+    return errors; // 无需验证其他字段
+  }
+
+  // 基本信息必填字段（Q2-Q6）
+  const requiredBasic = ['Q2', 'Q3', 'Q4', 'Q5', 'Q6'];
+  requiredBasic.forEach((field) => {
     if (!payload[field]) {
       errors.push(`缺少必填字段: ${field}`);
     }
   });
 
+  // 参观特征必填字段（Q8-Q15，Q10是多选）
+  const requiredVisit = ['Q8', 'Q9', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15'];
+  requiredVisit.forEach((field) => {
+    if (!payload[field]) {
+      errors.push(`缺少必填字段: ${field}`);
+    }
+  });
+
+  // Q10 多选题检查
+  if (!payload.Q10 || (Array.isArray(payload.Q10) && payload.Q10.length === 0)) {
+    errors.push('缺少必填字段: Q10（了解途径）');
+  }
+
+  // 满意度量表题验证（Q16-Q45）
   LIKERT_IDS.forEach((id) => {
+    const value = Number(payload[id]);
+    if (!Number.isFinite(value) || value < 1 || value > 5) {
+      errors.push(`题目 ${id} 的评分无效，需为 1-5 之间的数字`);
+    }
+  });
+
+  // 行为意向题验证（Q46-Q47）
+  INTENT_IDS.forEach((id) => {
     const value = Number(payload[id]);
     if (!Number.isFinite(value) || value < 1 || value > 5) {
       errors.push(`题目 ${id} 的评分无效，需为 1-5 之间的数字`);
@@ -106,11 +152,15 @@ function tallyByField(list, field) {
 
 function buildStats(records) {
   const count = records.length;
+  
+  // 过滤掉筛选未通过的记录
+  const validRecords = records.filter(r => r.Q1 === '是' && !r.filtered);
 
-  const likertStats = LIKERT_IDS.reduce((acc, id) => {
+  // 量表统计（包括满意度和行为意向）
+  const likertStats = ALL_SCALE_IDS.reduce((acc, id) => {
     let sum = 0;
     let answered = 0;
-    records.forEach((r) => {
+    validRecords.forEach((r) => {
       const v = Number(r[id]);
       if (Number.isFinite(v)) {
         sum += v;
@@ -126,11 +176,16 @@ function buildStats(records) {
 
   return {
     count,
+    validCount: validRecords.length,
     demographics: {
-      gender: tallyByField(records, 'gender'),
-      age: tallyByField(records, 'age'),
-      edu: tallyByField(records, 'edu'),
-      tech: tallyByField(records, 'tech'),
+      gender: tallyByField(validRecords, 'Q2'),       // 性别
+      residence: tallyByField(validRecords, 'Q3'),    // 常住地
+      age: tallyByField(validRecords, 'Q4'),          // 年龄段
+      education: tallyByField(validRecords, 'Q5'),    // 受教育程度
+      occupation: tallyByField(validRecords, 'Q6'),   // 职业
+      income: tallyByField(validRecords, 'Q7'),       // 月收入
+      visitCount: tallyByField(validRecords, 'Q8'),   // 参观次数
+      purpose: tallyByField(validRecords, 'Q9'),      // 参观目的
     },
     likertStats,
     lastUpdated: new Date().toISOString(),
@@ -224,13 +279,23 @@ statsApp.get('/api/download', async (req, res) => {
     }
 
     // CSV 格式
-    const headers = ['submittedAt', 'ip', 'gender', 'age', 'edu', 'tech', ...LIKERT_IDS];
+    const headers = [
+      'submittedAt', 'ip', 
+      'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7',  // 基本信息
+      'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15',  // 参观特征
+      ...ALL_SCALE_IDS,  // 量表题 Q16-Q47
+      'Q48', 'Q49'  // 开放题
+    ];
     const csvRows = [headers.join(',')];
     all.forEach((r) => {
       const row = headers.map((h) => {
-        const val = r[h] ?? '';
+        let val = r[h] ?? '';
+        // 多选题转为分号分隔
+        if (Array.isArray(val)) {
+          val = val.join(';');
+        }
         // 转义包含逗号或引号的值
-        if (typeof val === 'string' && (val.includes(',') || val.includes('"'))) {
+        if (typeof val === 'string' && (val.includes(',') || val.includes('"') || val.includes('\n'))) {
           return `"${val.replace(/"/g, '""')}"`;
         }
         return val;

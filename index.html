@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>浙江省博物馆AR导览系统体验调查</title>
+    <title>滁州市博物馆游客满意度调查问卷</title>
     <style>
         :root {
             --primary-color: #2c5f2d; /* 博物馆绿 */
@@ -83,6 +83,17 @@
             margin-bottom: 10px;
         }
 
+        .question-help {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .required-mark {
+            color: #e74c3c;
+            margin-left: 4px;
+        }
+
         /* 选项样式 */
         .options-group {
             display: flex;
@@ -90,7 +101,7 @@
             gap: 8px;
         }
 
-        .radio-label {
+        .radio-label, .checkbox-label {
             display: flex;
             align-items: center;
             cursor: pointer;
@@ -99,11 +110,11 @@
             transition: background 0.2s;
         }
 
-        .radio-label:hover {
+        .radio-label:hover, .checkbox-label:hover {
             background-color: #f0f0f0;
         }
 
-        input[type="radio"] {
+        input[type="radio"], input[type="checkbox"] {
             margin-right: 10px;
             accent-color: var(--primary-color);
             transform: scale(1.2);
@@ -145,6 +156,7 @@
             border-radius: var(--border-radius);
             min-height: 100px;
             font-family: inherit;
+            box-sizing: border-box;
         }
 
         .submit-btn {
@@ -165,6 +177,23 @@
             background-color: #1e4220;
         }
 
+        .end-card {
+            text-align: center;
+            padding: 30px;
+            background: #f9f9f9;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+        }
+
+        .end-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
         @media (max-width: 600px) {
             .container { padding: 15px; }
             .likert-desc { display: none; } /* 手机上隐藏文字描述，只显示数字 */
@@ -176,59 +205,222 @@
 <body>
 
 <div class="container">
-    <h1>浙江省博物馆AR导览系统<br>游客满意度调查</h1>
+    <h1>滁州市博物馆游客满意度调查问卷</h1>
     
     <div class="intro">
-        <p>尊敬的游客朋友：您好！本问卷旨在了解您在浙江省博物馆使用AR（增强现实）导览系统的真实体验。本问卷实行匿名制，所有数据仅用于学术毕业论文分析，请您根据真实感受放心填写。</p>
+        <p>本问卷用于"文旅融合背景下滁州市博物馆游客满意度研究"，匿名填写，数据仅用于学术研究与论文写作。<br>除特别说明外均为单选；满意度题采用 5 点量表：非常不满意 / 不满意 / 一般 / 满意 / 非常满意。</p>
     </div>
 
     <form id="surveyForm">
 
-        <div class="section-title">第一部分：基本资料</div>
+        <!-- 一、筛选题 -->
+        <div class="section-title">一、筛选题</div>
+
+        <div class="question-block" id="q1-block">
+            <label class="question-label">1. 您是否已经参观过滁州市博物馆（本次或近期）？<span class="required-mark">*</span></label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="Q1" value="是" required> 是（继续作答）</label>
+                <label class="radio-label"><input type="radio" name="Q1" value="否"> 否（结束问卷）</label>
+            </div>
+        </div>
+
+        <!-- 结束卡片（筛选不通过时显示） -->
+        <div id="endCard" class="end-card hidden">
+            <h2>感谢配合 💫</h2>
+            <p>您选择了"未参观"，问卷到此结束。</p>
+        </div>
+
+        <!-- 以下内容在筛选通过后显示 -->
+        <div id="mainContent">
+
+        <!-- 二、受访者基本信息 -->
+        <div class="section-title">二、受访者基本信息</div>
 
         <div class="question-block">
-            <label class="question-label">1. 您的性别</label>
+            <label class="question-label">2. 您的性别：<span class="required-mark">*</span></label>
             <div class="options-group">
-                <label class="radio-label"><input type="radio" name="gender" value="男" required> 男</label>
-                <label class="radio-label"><input type="radio" name="gender" value="女"> 女</label>
+                <label class="radio-label"><input type="radio" name="Q2" value="男" required> 男</label>
+                <label class="radio-label"><input type="radio" name="Q2" value="女"> 女</label>
+                <label class="radio-label"><input type="radio" name="Q2" value="其他/不便透露"> 其他/不便透露</label>
             </div>
         </div>
 
         <div class="question-block">
-            <label class="question-label">2. 您的年龄</label>
+            <label class="question-label">3. 您的常住地：<span class="required-mark">*</span></label>
             <div class="options-group">
-                <label class="radio-label"><input type="radio" name="age" value="18岁以下" required> 18岁以下</label>
-                <label class="radio-label"><input type="radio" name="age" value="18-25岁"> 18-25岁</label>
-                <label class="radio-label"><input type="radio" name="age" value="26-40岁"> 26-40岁</label>
-                <label class="radio-label"><input type="radio" name="age" value="41-60岁"> 41-60岁</label>
-                <label class="radio-label"><input type="radio" name="age" value="60岁以上"> 60岁以上</label>
+                <label class="radio-label"><input type="radio" name="Q3" value="滁州本地（含周边区县）" required> 滁州本地（含周边区县）</label>
+                <label class="radio-label"><input type="radio" name="Q3" value="安徽省内其他城市"> 安徽省内其他城市</label>
+                <label class="radio-label"><input type="radio" name="Q3" value="省外"> 省外</label>
             </div>
         </div>
 
         <div class="question-block">
-            <label class="question-label">3. 您的受教育程度</label>
+            <label class="question-label">4. 您的年龄段：<span class="required-mark">*</span></label>
             <div class="options-group">
-                <label class="radio-label"><input type="radio" name="edu" value="高中及以下" required> 高中及以下</label>
-                <label class="radio-label"><input type="radio" name="edu" value="大专"> 大专</label>
-                <label class="radio-label"><input type="radio" name="edu" value="本科"> 本科</label>
-                <label class="radio-label"><input type="radio" name="edu" value="硕士及以上"> 硕士及以上</label>
+                <label class="radio-label"><input type="radio" name="Q4" value="18岁以下" required> 18岁以下</label>
+                <label class="radio-label"><input type="radio" name="Q4" value="18–25岁"> 18–25岁</label>
+                <label class="radio-label"><input type="radio" name="Q4" value="26–35岁"> 26–35岁</label>
+                <label class="radio-label"><input type="radio" name="Q4" value="36–45岁"> 36–45岁</label>
+                <label class="radio-label"><input type="radio" name="Q4" value="46–60岁"> 46–60岁</label>
+                <label class="radio-label"><input type="radio" name="Q4" value="60岁以上"> 60岁以上</label>
             </div>
         </div>
 
         <div class="question-block">
-            <label class="question-label">4. 您使用AR/VR等数智技术的频率</label>
+            <label class="question-label">5. 您的受教育程度：<span class="required-mark">*</span></label>
             <div class="options-group">
-                <label class="radio-label"><input type="radio" name="tech" value="几乎从不" required> 几乎从不</label>
-                <label class="radio-label"><input type="radio" name="tech" value="偶尔尝试"> 偶尔尝试</label>
-                <label class="radio-label"><input type="radio" name="tech" value="经常使用"> 经常使用</label>
-                <label class="radio-label"><input type="radio" name="tech" value="非常精通"> 非常精通</label>
+                <label class="radio-label"><input type="radio" name="Q5" value="初中及以下" required> 初中及以下</label>
+                <label class="radio-label"><input type="radio" name="Q5" value="高中/中专"> 高中/中专</label>
+                <label class="radio-label"><input type="radio" name="Q5" value="大专"> 大专</label>
+                <label class="radio-label"><input type="radio" name="Q5" value="本科"> 本科</label>
+                <label class="radio-label"><input type="radio" name="Q5" value="研究生及以上"> 研究生及以上</label>
             </div>
         </div>
 
-        <div class="section-title">第二部分：AR体验评分</div>
-        <p style="font-size: 12px; color: #666; text-align: center;">(5=非常同意，3=一般，1=非常不同意)</p>
+        <div class="question-block">
+            <label class="question-label">6. 您的职业：<span class="required-mark">*</span></label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="Q6" value="学生" required> 学生</label>
+                <label class="radio-label"><input type="radio" name="Q6" value="企事业单位职员"> 企事业单位职员</label>
+                <label class="radio-label"><input type="radio" name="Q6" value="公务员/事业编"> 公务员/事业编</label>
+                <label class="radio-label"><input type="radio" name="Q6" value="自由职业"> 自由职业</label>
+                <label class="radio-label"><input type="radio" name="Q6" value="退休"> 退休</label>
+                <label class="radio-label"><input type="radio" name="Q6" value="其他"> 其他</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <label class="question-label">7. 您的月收入（或生活费）水平：</label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="Q7" value="3000元以下"> 3000元以下</label>
+                <label class="radio-label"><input type="radio" name="Q7" value="3001–6000元"> 3001–6000元</label>
+                <label class="radio-label"><input type="radio" name="Q7" value="6001–10000元"> 6001–10000元</label>
+                <label class="radio-label"><input type="radio" name="Q7" value="10001–15000元"> 10001–15000元</label>
+                <label class="radio-label"><input type="radio" name="Q7" value="15000元以上"> 15000元以上</label>
+                <label class="radio-label"><input type="radio" name="Q7" value="不便透露"> 不便透露</label>
+            </div>
+        </div>
+
+        <!-- 三、参观特征与基础认知 -->
+        <div class="section-title">三、参观特征与基础认知</div>
+
+        <div class="question-block">
+            <label class="question-label">8. 您此次为第几次参观滁州市博物馆？<span class="required-mark">*</span></label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="Q8" value="第一次" required> 第一次</label>
+                <label class="radio-label"><input type="radio" name="Q8" value="2–3次"> 2–3次</label>
+                <label class="radio-label"><input type="radio" name="Q8" value="4次及以上"> 4次及以上</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <label class="question-label">9. 您本次参观的主要目的：<span class="required-mark">*</span></label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="Q9" value="休闲参观" required> 休闲参观</label>
+                <label class="radio-label"><input type="radio" name="Q9" value="学习研学"> 学习研学</label>
+                <label class="radio-label"><input type="radio" name="Q9" value="陪同亲友"> 陪同亲友</label>
+                <label class="radio-label"><input type="radio" name="Q9" value="特展/活动"> 特展/活动</label>
+                <label class="radio-label"><input type="radio" name="Q9" value="其他"> 其他</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <label class="question-label">10. 您通过哪些途径了解滁州市博物馆（或本次展讯/活动）？<span class="required-mark">*</span></label>
+            <div class="question-help">可多选</div>
+            <div class="options-group">
+                <label class="checkbox-label"><input type="checkbox" name="Q10" value="亲友推荐"> 亲友推荐</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q10" value="短视频/社交媒体"> 短视频/社交媒体</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q10" value="旅游平台/点评"> 旅游平台/点评</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q10" value="学校/单位组织"> 学校/单位组织</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q10" value="官网/公众号/小程序"> 官网/公众号/小程序</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q10" value="路过看到"> 路过看到</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q10" value="其他"> 其他</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <label class="question-label">11. 您本次主要出行方式：<span class="required-mark">*</span></label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="Q11" value="步行/自行车" required> 步行/自行车</label>
+                <label class="radio-label"><input type="radio" name="Q11" value="公交"> 公交</label>
+                <label class="radio-label"><input type="radio" name="Q11" value="私家车/网约车"> 私家车/网约车</label>
+                <label class="radio-label"><input type="radio" name="Q11" value="其他"> 其他</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <label class="question-label">12. 您本次参观时长大约为：<span class="required-mark">*</span></label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="Q12" value="1小时以内" required> 1小时以内</label>
+                <label class="radio-label"><input type="radio" name="Q12" value="1–2小时"> 1–2小时</label>
+                <label class="radio-label"><input type="radio" name="Q12" value="2–3小时"> 2–3小时</label>
+                <label class="radio-label"><input type="radio" name="Q12" value="3小时以上"> 3小时以上</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <label class="question-label">13. 您本次是否参加馆内讲解/导览服务？<span class="required-mark">*</span></label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="Q13" value="参加了人工讲解" required> 参加了人工讲解</label>
+                <label class="radio-label"><input type="radio" name="Q13" value="使用了语音/扫码导览"> 使用了语音/扫码导览</label>
+                <label class="radio-label"><input type="radio" name="Q13" value="未使用"> 未使用</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <label class="question-label">14. 您本次是否参与博物馆组织的社教/公共文化活动？（讲座、研学、导赏等）<span class="required-mark">*</span></label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="Q14" value="是" required> 是</label>
+                <label class="radio-label"><input type="radio" name="Q14" value="否"> 否</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <label class="question-label">15. 您本次是否在文创店消费？<span class="required-mark">*</span></label>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="Q15" value="有" required> 有</label>
+                <label class="radio-label"><input type="radio" name="Q15" value="没有"> 没有</label>
+            </div>
+        </div>
+
+        <!-- 四、满意度测评 -->
+        <div class="section-title">四、满意度测评</div>
+        <p style="font-size: 12px; color: #666; text-align: center;">(5=非常满意，4=满意，3=一般，2=不满意，1=非常不满意)</p>
 
         <div id="likert-questions-container"></div>
+
+        <!-- 五、行为意向 -->
+        <div class="section-title">五、行为意向</div>
+        <p style="font-size: 12px; color: #666; text-align: center;">(5=非常愿意，4=愿意，3=一般，2=不愿意，1=非常不愿意)</p>
+
+        <div id="intent-questions-container"></div>
+
+        <!-- 六、开放题 -->
+        <div class="section-title">六、开放题（可选）</div>
+
+        <div class="question-block">
+            <label class="question-label">48. 您认为滁州市博物馆最需要优先改进的方面是哪些？</label>
+            <div class="question-help">可多选，也可不选</div>
+            <div class="options-group">
+                <label class="checkbox-label"><input type="checkbox" name="Q48" value="展览展陈"> 展览展陈</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q48" value="导览讲解"> 导览讲解</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q48" value="动线标识"> 动线标识</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q48" value="基础设施/便民设施"> 基础设施/便民设施</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q48" value="环境舒适度（空调/通风等）"> 环境舒适度（空调/通风等）</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q48" value="安全与秩序"> 安全与秩序</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q48" value="文创产品"> 文创产品</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q48" value="社教活动"> 社教活动</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q48" value="宣传信息"> 宣传信息</label>
+                <label class="checkbox-label"><input type="checkbox" name="Q48" value="其他"> 其他</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <label class="question-label">49. 您对滁州市博物馆还有哪些建议？</label>
+            <textarea name="Q49" placeholder="请在此填写（可不填）"></textarea>
+        </div>
+
+        </div><!-- /mainContent -->
 
         <button type="submit" class="submit-btn">提交问卷</button>
 
@@ -236,104 +428,197 @@
 </div>
 
 <script>
-    // 定义核心量表题目
+document.addEventListener('DOMContentLoaded', function() {
+    // 满意度量表题目（Q16-Q45）
     const likertQuestions = [
-        { id: "A1", text: "A1. AR导览提供的文物解说内容非常详尽、丰富。" },
-        { id: "A2", text: "A2. 相比传统文字牌，AR展示的信息让我更容易理解历史背景。" },
-        { id: "A3", text: "A3. 系统提供的信息准确无误，具有很高的知识价值。" },
-        { id: "A4", text: "A4. 我通过AR导览获取了许多如果不使用就无法得知的额外信息。" },
-        { id: "A5", text: "A5. 使用AR导览寻找和扫描文物的过程非常有趣。" },
-        { id: "A6", text: "A6. 系统中的3D动画或特效生动逼真，增加了参观的乐趣。" },
-        { id: "A7", text: "A7. 这种导览方式让我感到愉快和放松。" },
-        { id: "A8", text: "A8. 相比单纯看展品，AR互动让我的参观过程不再枯燥。" },
-        { id: "A9", text: "A9. 我可以自由控制AR导览的进度和展示内容。" },
-        { id: "A10", text: "A10. 系统对我发出的指令（如点击、缩放、扫描）反应非常迅速。" },
-        { id: "A11", text: "A11. 我感觉我是在与系统进行双向互动，而不是被动观看。" },
-        { id: "A12", text: "A12. 整个AR导览系统的界面设计清晰，图标含义一目了然。" },
-        { id: "A13", text: "A13. 即使没有工作人员指导，我也能很快学会如何使用它。" },
-        { id: "A14", text: "A14. 在使用过程中，系统运行稳定，很少出现卡顿或闪退。" },
-        { id: "A15", text: "A15. 使用该系统不需要花费我太多的精力和脑力。" },
-        
-        { id: "B1", text: "B1. 通过AR体验，我对浙江省博物馆的藏品印象更加深刻了。" },
-        { id: "B2", text: "B2. 这次体验激发了我对相关历史文化的探索兴趣。" },
-        { id: "B3", text: "B3. 我觉得自己在这个过程中学到了很多新知识。" },
-        { id: "B4", text: "B4. 在使用AR时，我仿佛身临其境，穿越到了历史场景中。" },
-        { id: "B5", text: "B5. 我的注意力完全被AR内容吸引，忘记了周围的嘈杂。" },
-        { id: "B6", text: "B6. 虚拟内容与现实文物的融合非常自然，让我感到很投入。" },
-        { id: "B7", text: "B7. 因为这次独特的AR体验，我对浙江省博物馆产生了好感。" },
-        { id: "B8", text: "B8. 我觉得浙江省博物馆是一个有温度、有情感的地方。" },
-        { id: "B9", text: "B9. 这里的数字化体验让我对这个博物馆产生了一种特殊的认同感。" },
-        
-        { id: "C1", text: "C1. 总体而言，我对这次AR导览体验感到非常满意。" },
-        { id: "C2", text: "C2. 这次体验完全达到了（甚至超过了）我对智慧导览的预期。" },
-        { id: "C3", text: "C3. 我认为花费时间和精力使用这个系统是值得的。" },
-        { id: "C4", text: "C4. 未来如果再来博物馆，我还会愿意使用AR导览系统。" },
-        { id: "C5", text: "C5. 我会向我的亲戚、朋友推荐浙江省博物馆的AR导览体验。" },
-        { id: "C6", text: "C6. 我愿意在社交媒体（如微信、小红书）上分享这次有趣的AR体验。" }
+        // A 有形性
+        { id: "Q16", text: "16. 您对馆内环境整洁与卫生状况是否满意？", section: "A. 有形性 Tangibles" },
+        { id: "Q17", text: "17. 您对照明、展柜、展厅布置等展陈硬件条件是否满意？" },
+        { id: "Q18", text: "18. 您对馆内温度、通风与整体舒适度是否满意？（如空调、空气流通）" },
+        { id: "Q19", text: "19. 您对休息区/座椅等休憩设施的数量与便利性是否满意？" },
+        { id: "Q20", text: "20. 您对无障碍与便民设施是否满意？（电梯、母婴/老人友好设施、饮水、寄存等）" },
+        { id: "Q21", text: "21. 您对馆内指示标识（楼层指引、展厅导向、路线提示）的清晰度是否满意？" },
+        // B 可靠性
+        { id: "Q22", text: "22. 您对开放时间执行与入馆规则（如是否准时开闭馆、秩序稳定）是否满意？", section: "B. 可靠性 Reliability" },
+        { id: "Q23", text: "23. 您对展览信息的准确性与完整性是否满意？（展品说明、主题阐释等）" },
+        { id: "Q24", text: "24. 您对预约/购票/入馆核验等流程的稳定性与可靠性是否满意？" },
+        { id: "Q25", text: "25. 您对导览解说内容的准确性、专业性与一致性是否满意？（文字/语音/人工）" },
+        { id: "Q26", text: "26. 您对文创商品信息的透明度与可信度是否满意？（价格标注、说明提示等）" },
+        // C 响应性
+        { id: "Q27", text: "27. 您对工作人员/志愿者在咨询引导时的响应速度是否满意？", section: "C. 响应性 Responsiveness" },
+        { id: "Q28", text: "28. 您对高峰期排队组织与人流疏导效率是否满意？（入口、热门展厅等）" },
+        { id: "Q29", text: "29. 您对讲解服务的获取便利性是否满意？（预约、排班、现场可获得性）" },
+        { id: "Q30", text: "30. 您对现场问题处理与投诉建议反馈的及时性是否满意？" },
+        { id: "Q31", text: "31. 您对线上信息服务的响应是否满意？（公众号/小程序的信息更新与提示）" },
+        // D 保证性
+        { id: "Q32", text: "32. 您对工作人员服务态度与礼貌规范是否满意？", section: "D. 保证性 Assurance" },
+        { id: "Q33", text: "33. 您对工作人员业务能力与专业解答水平是否满意？" },
+        { id: "Q34", text: "34. 您对馆内安全保障是否满意？（安保巡查、应急提示、秩序维护）" },
+        { id: "Q35", text: "35. 您对参观过程中的安全感与秩序感是否满意？（拥挤管理、文明参观引导等）" },
+        // E 移情性
+        { id: "Q36", text: "36. 您对博物馆对不同群体的关怀程度是否满意？（老人、儿童、行动不便者等）", section: "E. 移情性 Empathy" },
+        { id: "Q37", text: "37. 您对服务是否以游客为中心的体验是否满意？（耐心解释、主动帮助、尊重需求）" },
+        { id: "Q38", text: "38. 您对参观动线设计的人性化程度是否满意？（是否易走、易懂、少绕路、少误导）" },
+        { id: "Q39", text: "39. 您对参观节奏与空间体验是否满意？（是否能较从容观展、减少干扰与过度拥挤）" },
+        // F 文旅融合体验
+        { id: "Q40", text: "40. 您对展览是否充分体现滁州地方文化特色并增强文化获得感是否满意？", section: "F. 文旅融合体验" },
+        { id: "Q41", text: "41. 您对互动体验与智慧化体验是否满意？（数字化展项、AR/VR、扫码导览等）" },
+        { id: "Q42", text: "42. 您对博物馆对外宣传与信息触达效果是否满意？（展讯推送、活动预告等）" },
+        { id: "Q43", text: "43. 您对社教活动/公共文化活动的体验是否满意？（讲座、研学、导赏等）" },
+        { id: "Q44", text: "44. 您对文创产品的吸引力是否满意？（特色性、种类丰富度、性价比等）" },
+        // G 总体满意度
+        { id: "Q45", text: "45. 您对滁州市博物馆的整体满意度如何？", section: "G. 总体满意度" }
     ];
 
-    // 动态生成量表HTML
-    const container = document.getElementById('likert-questions-container');
-    const subSectionTitles = {
-        'A1': 'A. AR导览系统',
-        'B1': 'B. 游客满意度',
-        'C1': 'C. 未来预期'
-    };
-    likertQuestions.forEach(q => {
-        // 在A1、B1、C1之前插入副标题
-        if (subSectionTitles[q.id]) {
-            const subtitle = document.createElement('div');
-            subtitle.className = 'sub-section-title';
-            subtitle.textContent = subSectionTitles[q.id];
-            container.appendChild(subtitle);
-        }
-        const div = document.createElement('div');
-        div.className = 'question-block';
-        div.innerHTML = `
-            <label class="question-label">${q.text}</label>
-            <div class="likert-scale">
-                <label class="likert-option">
-                    <span class="likert-num">5</span>
-                    <input type="radio" name="${q.id}" value="5" required>
-                    <span class="likert-desc">非常同意</span>
-                </label>
-                <label class="likert-option">
-                    <span class="likert-num">4</span>
-                    <input type="radio" name="${q.id}" value="4">
-                    <span class="likert-desc">同意</span>
-                </label>
-                <label class="likert-option">
-                    <span class="likert-num">3</span>
-                    <input type="radio" name="${q.id}" value="3">
-                    <span class="likert-desc">一般</span>
-                </label>
-                <label class="likert-option">
-                    <span class="likert-num">2</span>
-                    <input type="radio" name="${q.id}" value="2">
-                    <span class="likert-desc">不同意</span>
-                </label>
-                <label class="likert-option">
-                    <span class="likert-num">1</span>
-                    <input type="radio" name="${q.id}" value="1">
-                    <span class="likert-desc">非常不同意</span>
-                </label>
-            </div>
-        `;
-        container.appendChild(div);
+    // 行为意向题目（Q46-Q47）
+    const intentQuestions = [
+        { id: "Q46", text: "46. 未来您愿意向亲友推荐滁州市博物馆。" },
+        { id: "Q47", text: "47. 未来您愿意再次参观滁州市博物馆。" }
+    ];
+
+    // 动态生成满意度量表HTML
+    const likertContainer = document.getElementById('likert-questions-container');
+    if (likertContainer) {
+        likertQuestions.forEach(q => {
+            if (q.section) {
+                const subtitle = document.createElement('div');
+                subtitle.className = 'sub-section-title';
+                subtitle.textContent = q.section;
+                likertContainer.appendChild(subtitle);
+            }
+            const div = document.createElement('div');
+            div.className = 'question-block';
+            div.innerHTML = `
+                <label class="question-label">${q.text}<span class="required-mark">*</span></label>
+                <div class="likert-scale">
+                    <label class="likert-option">
+                        <span class="likert-num">5</span>
+                        <input type="radio" name="${q.id}" value="5" required>
+                        <span class="likert-desc">非常满意</span>
+                    </label>
+                    <label class="likert-option">
+                        <span class="likert-num">4</span>
+                        <input type="radio" name="${q.id}" value="4">
+                        <span class="likert-desc">满意</span>
+                    </label>
+                    <label class="likert-option">
+                        <span class="likert-num">3</span>
+                        <input type="radio" name="${q.id}" value="3">
+                        <span class="likert-desc">一般</span>
+                    </label>
+                    <label class="likert-option">
+                        <span class="likert-num">2</span>
+                        <input type="radio" name="${q.id}" value="2">
+                        <span class="likert-desc">不满意</span>
+                    </label>
+                    <label class="likert-option">
+                        <span class="likert-num">1</span>
+                        <input type="radio" name="${q.id}" value="1">
+                        <span class="likert-desc">非常不满意</span>
+                    </label>
+                </div>
+            `;
+            likertContainer.appendChild(div);
+        });
+    }
+
+    // 动态生成行为意向HTML
+    const intentContainer = document.getElementById('intent-questions-container');
+    if (intentContainer) {
+        intentQuestions.forEach(q => {
+            const div = document.createElement('div');
+            div.className = 'question-block';
+            div.innerHTML = `
+                <label class="question-label">${q.text}<span class="required-mark">*</span></label>
+                <div class="likert-scale">
+                    <label class="likert-option">
+                        <span class="likert-num">5</span>
+                        <input type="radio" name="${q.id}" value="5" required>
+                        <span class="likert-desc">非常愿意</span>
+                    </label>
+                    <label class="likert-option">
+                        <span class="likert-num">4</span>
+                        <input type="radio" name="${q.id}" value="4">
+                        <span class="likert-desc">愿意</span>
+                    </label>
+                    <label class="likert-option">
+                        <span class="likert-num">3</span>
+                        <input type="radio" name="${q.id}" value="3">
+                        <span class="likert-desc">一般</span>
+                    </label>
+                    <label class="likert-option">
+                        <span class="likert-num">2</span>
+                        <input type="radio" name="${q.id}" value="2">
+                        <span class="likert-desc">不愿意</span>
+                    </label>
+                    <label class="likert-option">
+                        <span class="likert-num">1</span>
+                        <input type="radio" name="${q.id}" value="1">
+                        <span class="likert-desc">非常不愿意</span>
+                    </label>
+                </div>
+            `;
+            intentContainer.appendChild(div);
+        });
+    }
+
+    // 筛选题逻辑
+    const mainContent = document.getElementById('mainContent');
+    const endCard = document.getElementById('endCard');
+    const submitBtn = document.querySelector('.submit-btn');
+
+    document.querySelectorAll('input[name="Q1"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === '否') {
+                mainContent.classList.add('hidden');
+                endCard.classList.remove('hidden');
+                submitBtn.textContent = '提交并结束';
+            } else {
+                mainContent.classList.remove('hidden');
+                endCard.classList.add('hidden');
+                submitBtn.textContent = '提交问卷';
+            }
+        });
     });
 
-    // 表单提交处理：将数据发送到后端接口
+    // 表单提交处理
     document.getElementById('surveyForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const formData = new FormData(this);
         const data = {};
+        
+        // 收集单选题
         for (const [key, value] of formData.entries()) {
-            data[key] = value;
+            if (data[key]) {
+                // 多选题：转为数组
+                if (Array.isArray(data[key])) {
+                    data[key].push(value);
+                } else {
+                    data[key] = [data[key], value];
+                }
+            } else {
+                data[key] = value;
+            }
+        }
+
+        // 检查筛选题
+        if (data.Q1 === '否') {
+            // 筛选不通过，只提交Q1
+            data.filtered = true;
+        }
+
+        // 检查Q10多选题是否至少选一个（如果不是筛选结束）
+        if (data.Q1 === '是') {
+            const q10Checked = document.querySelectorAll('input[name="Q10"]:checked');
+            if (q10Checked.length === 0) {
+                alert('请至少选择一个了解途径（第10题）');
+                return;
+            }
         }
 
         // 将量表项转成数字便于后端统计
-        likertQuestions.forEach(q => {
+        [...likertQuestions, ...intentQuestions].forEach(q => {
             if (data[q.id]) {
                 data[q.id] = Number(data[q.id]);
             }
@@ -355,11 +640,16 @@
 
             alert('✨ 问卷提交成功，感谢您的参与！');
             this.reset();
+            // 重置筛选状态
+            mainContent.classList.remove('hidden');
+            endCard.classList.add('hidden');
+            submitBtn.textContent = '提交问卷';
         } catch (err) {
             console.error(err);
             alert('提交失败：' + err.message);
         }
     });
+});
 </script>
 
 </body>
