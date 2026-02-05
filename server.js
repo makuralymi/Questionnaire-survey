@@ -9,19 +9,19 @@ const SURVEY_PORT = process.env.SURVEY_PORT || 1144;
 const STATS_PORT = process.env.STATS_PORT || 1145;
 const DATA_FILE = path.join(__dirname, 'data', 'responses.json');
 
-// 满意度量表题目ID（Q16-Q45）
+// 满意度量表题目ID（Q16-Q36）
 const LIKERT_IDS = [
-  'Q16','Q17','Q18','Q19','Q20','Q21', // 有形性
-  'Q22','Q23','Q24','Q25','Q26',       // 可靠性
-  'Q27','Q28','Q29','Q30','Q31',       // 响应性
-  'Q32','Q33','Q34','Q35',             // 保证性
-  'Q36','Q37','Q38','Q39',             // 移情性
-  'Q40','Q41','Q42','Q43','Q44',       // 文旅融合体验
-  'Q45'                                 // 总体满意度
+  'Q16','Q17','Q18','Q19',       // 有形性
+  'Q20','Q21','Q22',             // 可靠性
+  'Q23','Q24','Q25',             // 响应性
+  'Q26','Q27','Q28',             // 保证性
+  'Q29','Q30','Q31',             // 移情性
+  'Q32','Q33','Q34','Q35',       // 文旅融合体验
+  'Q36'                          // 总体满意度
 ];
 
-// 行为意向题目ID（Q46-Q47）
-const INTENT_IDS = ['Q46', 'Q47'];
+// 行为意向题目ID（Q37-Q38）
+const INTENT_IDS = ['Q37', 'Q38'];
 
 // 所有量表题（用于统计）
 const ALL_SCALE_IDS = [...LIKERT_IDS, ...INTENT_IDS];
@@ -283,8 +283,7 @@ statsApp.get('/api/download', async (req, res) => {
       'submittedAt', 'ip', 
       'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7',  // 基本信息
       'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15',  // 参观特征
-      ...ALL_SCALE_IDS,  // 量表题 Q16-Q47
-      'Q48', 'Q49'  // 开放题
+      ...ALL_SCALE_IDS  // 量表题 Q16-Q38
     ];
     const csvRows = [headers.join(',')];
     all.forEach((r) => {

@@ -395,31 +395,6 @@
 
         <div id="intent-questions-container"></div>
 
-        <!-- 六、开放题 -->
-        <div class="section-title">六、开放题（可选）</div>
-
-        <div class="question-block">
-            <label class="question-label">48. 您认为滁州市博物馆最需要优先改进的方面是哪些？</label>
-            <div class="question-help">可多选，也可不选</div>
-            <div class="options-group">
-                <label class="checkbox-label"><input type="checkbox" name="Q48" value="展览展陈"> 展览展陈</label>
-                <label class="checkbox-label"><input type="checkbox" name="Q48" value="导览讲解"> 导览讲解</label>
-                <label class="checkbox-label"><input type="checkbox" name="Q48" value="动线标识"> 动线标识</label>
-                <label class="checkbox-label"><input type="checkbox" name="Q48" value="基础设施/便民设施"> 基础设施/便民设施</label>
-                <label class="checkbox-label"><input type="checkbox" name="Q48" value="环境舒适度（空调/通风等）"> 环境舒适度（空调/通风等）</label>
-                <label class="checkbox-label"><input type="checkbox" name="Q48" value="安全与秩序"> 安全与秩序</label>
-                <label class="checkbox-label"><input type="checkbox" name="Q48" value="文创产品"> 文创产品</label>
-                <label class="checkbox-label"><input type="checkbox" name="Q48" value="社教活动"> 社教活动</label>
-                <label class="checkbox-label"><input type="checkbox" name="Q48" value="宣传信息"> 宣传信息</label>
-                <label class="checkbox-label"><input type="checkbox" name="Q48" value="其他"> 其他</label>
-            </div>
-        </div>
-
-        <div class="question-block">
-            <label class="question-label">49. 您对滁州市博物馆还有哪些建议？</label>
-            <textarea name="Q49" placeholder="请在此填写（可不填）"></textarea>
-        </div>
-
         </div><!-- /mainContent -->
 
         <button type="submit" class="submit-btn">提交问卷</button>
@@ -429,51 +404,42 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 满意度量表题目（Q16-Q45）
+    // 满意度量表题目（Q16-Q36）
     const likertQuestions = [
         // A 有形性
         { id: "Q16", text: "16. 您对馆内环境整洁与卫生状况是否满意？", section: "A. 有形性 Tangibles" },
-        { id: "Q17", text: "17. 您对照明、展柜、展厅布置等展陈硬件条件是否满意？" },
-        { id: "Q18", text: "18. 您对馆内温度、通风与整体舒适度是否满意？（如空调、空气流通）" },
-        { id: "Q19", text: "19. 您对休息区/座椅等休憩设施的数量与便利性是否满意？" },
-        { id: "Q20", text: "20. 您对无障碍与便民设施是否满意？（电梯、母婴/老人友好设施、饮水、寄存等）" },
-        { id: "Q21", text: "21. 您对馆内指示标识（楼层指引、展厅导向、路线提示）的清晰度是否满意？" },
+        { id: "Q17", text: "17. 您对馆内温度、通风与整体舒适度是否满意？（如空调、空气流通）" },
+        { id: "Q18", text: "18. 您对无障碍与便民设施是否满意？（电梯、母婴/老人友好设施、饮水、寄存等）" },
+        { id: "Q19", text: "19. 您对馆内指示标识（楼层指引、展厅导向、路线提示）的清晰度是否满意？" },
         // B 可靠性
-        { id: "Q22", text: "22. 您对开放时间执行与入馆规则（如是否准时开闭馆、秩序稳定）是否满意？", section: "B. 可靠性 Reliability" },
-        { id: "Q23", text: "23. 您对展览信息的准确性与完整性是否满意？（展品说明、主题阐释等）" },
-        { id: "Q24", text: "24. 您对预约/购票/入馆核验等流程的稳定性与可靠性是否满意？" },
-        { id: "Q25", text: "25. 您对导览解说内容的准确性、专业性与一致性是否满意？（文字/语音/人工）" },
-        { id: "Q26", text: "26. 您对文创商品信息的透明度与可信度是否满意？（价格标注、说明提示等）" },
+        { id: "Q20", text: "20. 您对开放时间执行与入馆规则（如是否准时开闭馆、秩序稳定）是否满意？", section: "B. 可靠性 Reliability" },
+        { id: "Q21", text: "21. 您对展览信息的准确性与完整性是否满意？（展品说明、主题阐释等）" },
+        { id: "Q22", text: "22. 您对导览解说内容的准确性、专业性与一致性是否满意？（文字/语音/人工）" },
         // C 响应性
-        { id: "Q27", text: "27. 您对工作人员/志愿者在咨询引导时的响应速度是否满意？", section: "C. 响应性 Responsiveness" },
-        { id: "Q28", text: "28. 您对高峰期排队组织与人流疏导效率是否满意？（入口、热门展厅等）" },
-        { id: "Q29", text: "29. 您对讲解服务的获取便利性是否满意？（预约、排班、现场可获得性）" },
-        { id: "Q30", text: "30. 您对现场问题处理与投诉建议反馈的及时性是否满意？" },
-        { id: "Q31", text: "31. 您对线上信息服务的响应是否满意？（公众号/小程序的信息更新与提示）" },
+        { id: "Q23", text: "23. 您对工作人员/志愿者在咨询引导时的响应速度是否满意？", section: "C. 响应性 Responsiveness" },
+        { id: "Q24", text: "24. 您对高峰期排队组织与人流疏导效率是否满意？（入口、热门展厅等）" },
+        { id: "Q25", text: "25. 您对现场问题处理与投诉建议反馈的及时性是否满意？" },
         // D 保证性
-        { id: "Q32", text: "32. 您对工作人员服务态度与礼貌规范是否满意？", section: "D. 保证性 Assurance" },
-        { id: "Q33", text: "33. 您对工作人员业务能力与专业解答水平是否满意？" },
-        { id: "Q34", text: "34. 您对馆内安全保障是否满意？（安保巡查、应急提示、秩序维护）" },
-        { id: "Q35", text: "35. 您对参观过程中的安全感与秩序感是否满意？（拥挤管理、文明参观引导等）" },
+        { id: "Q26", text: "26. 您对工作人员服务态度与礼貌规范是否满意？", section: "D. 保证性 Assurance" },
+        { id: "Q27", text: "27. 您对工作人员业务能力与专业解答水平是否满意？" },
+        { id: "Q28", text: "28. 您对参观过程中的安全感与秩序感是否满意？（拥挤管理、文明参观引导等）" },
         // E 移情性
-        { id: "Q36", text: "36. 您对博物馆对不同群体的关怀程度是否满意？（老人、儿童、行动不便者等）", section: "E. 移情性 Empathy" },
-        { id: "Q37", text: "37. 您对服务是否以游客为中心的体验是否满意？（耐心解释、主动帮助、尊重需求）" },
-        { id: "Q38", text: "38. 您对参观动线设计的人性化程度是否满意？（是否易走、易懂、少绕路、少误导）" },
-        { id: "Q39", text: "39. 您对参观节奏与空间体验是否满意？（是否能较从容观展、减少干扰与过度拥挤）" },
+        { id: "Q29", text: "29. 您对博物馆对不同群体的关怀程度是否满意？（老人、儿童、行动不便者等）", section: "E. 移情性 Empathy" },
+        { id: "Q30", text: "30. 您对服务是否以游客为中心的体验是否满意？（耐心解释、主动帮助、尊重需求）" },
+        { id: "Q31", text: "31. 您对参观动线设计的人性化程度是否满意？（是否易走、易懂、少绕路、少误导）" },
         // F 文旅融合体验
-        { id: "Q40", text: "40. 您对展览是否充分体现滁州地方文化特色并增强文化获得感是否满意？", section: "F. 文旅融合体验" },
-        { id: "Q41", text: "41. 您对互动体验与智慧化体验是否满意？（数字化展项、AR/VR、扫码导览等）" },
-        { id: "Q42", text: "42. 您对博物馆对外宣传与信息触达效果是否满意？（展讯推送、活动预告等）" },
-        { id: "Q43", text: "43. 您对社教活动/公共文化活动的体验是否满意？（讲座、研学、导赏等）" },
-        { id: "Q44", text: "44. 您对文创产品的吸引力是否满意？（特色性、种类丰富度、性价比等）" },
+        { id: "Q32", text: "32. 您对展览是否充分体现滁州地方文化特色并增强文化获得感是否满意？", section: "F. 文旅融合体验" },
+        { id: "Q33", text: "33. 您对互动体验与智慧化体验是否满意？（数字化展项、AR/VR、扫码导览等）" },
+        { id: "Q34", text: "34. 您对社教活动/公共文化活动的体验是否满意？（讲座、研学、导赏等）" },
+        { id: "Q35", text: "35. 您对文创产品的吸引力是否满意？（特色性、种类丰富度、性价比等）" },
         // G 总体满意度
-        { id: "Q45", text: "45. 您对滁州市博物馆的整体满意度如何？", section: "G. 总体满意度" }
+        { id: "Q36", text: "36. 您对滁州市博物馆的整体满意度如何？", section: "G. 总体满意度" }
     ];
 
-    // 行为意向题目（Q46-Q47）
+    // 行为意向题目（Q37-Q38）
     const intentQuestions = [
-        { id: "Q46", text: "46. 未来您愿意向亲友推荐滁州市博物馆。" },
-        { id: "Q47", text: "47. 未来您愿意再次参观滁州市博物馆。" }
+        { id: "Q37", text: "37. 未来您愿意向亲友推荐滁州市博物馆。" },
+        { id: "Q38", text: "38. 未来您愿意再次参观滁州市博物馆。" }
     ];
 
     // 动态生成满意度量表HTML
