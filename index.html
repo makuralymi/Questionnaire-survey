@@ -190,6 +190,61 @@
             margin-bottom: 10px;
         }
 
+        .progress-card {
+            position: fixed;
+            top: 120px;
+            right: 24px;
+            width: 220px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            padding: 16px;
+            border: 1px solid #e7ece8;
+            z-index: 20;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .progress-card.dragging {
+            cursor: grabbing;
+        }
+
+        .progress-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin: 0 0 8px;
+            color: var(--primary-color);
+        }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #eef5ef;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #2c5f2d 0%, #67a86a 100%);
+            transition: width 0.3s ease;
+        }
+
+        .progress-tip {
+            font-size: 12px;
+            color: #7a8a7a;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -200,9 +255,25 @@
             .likert-option:first-child .likert-desc, 
             .likert-option:last-child .likert-desc { display: block; } /* 只显示首尾描述 */
         }
+
+        @media (max-width: 1000px) {
+            .progress-card { display: none; }
+        }
     </style>
 </head>
 <body>
+
+<aside class="progress-card" id="progressCard" aria-live="polite">
+    <p class="progress-title">填写进度</p>
+    <div class="progress-meta">
+        <span id="progressCount">0/0</span>
+        <span id="progressPercent">0%</span>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+    </div>
+    <div class="progress-tip" id="progressTip">先完成筛选题，更多内容将展开。</div>
+</aside>
 
 <div class="container">
     <h1>滁州市博物馆游客满意度调查问卷</h1>
@@ -532,6 +603,123 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainContent = document.getElementById('mainContent');
     const endCard = document.getElementById('endCard');
     const submitBtn = document.querySelector('.submit-btn');
+    const progressCard = document.getElementById('progressCard');
+    const progressCount = document.getElementById('progressCount');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressBarFill = document.getElementById('progressBarFill');
+    const progressTip = document.getElementById('progressTip');
+
+    function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+    }
+
+    function initProgressCardDrag() {
+        if (!progressCard) return;
+
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let originLeft = 0;
+        let originTop = 0;
+
+        const onPointerDown = (event) => {
+            if (event.button !== undefined && event.button !== 0) return;
+            isDragging = true;
+            progressCard.classList.add('dragging');
+
+            const rect = progressCard.getBoundingClientRect();
+            startX = event.clientX;
+            startY = event.clientY;
+            originLeft = rect.left;
+            originTop = rect.top;
+
+            progressCard.style.left = `${originLeft}px`;
+            progressCard.style.top = `${originTop}px`;
+            progressCard.style.right = 'auto';
+
+            progressCard.setPointerCapture(event.pointerId);
+        };
+
+        const onPointerMove = (event) => {
+            if (!isDragging) return;
+
+            const deltaX = event.clientX - startX;
+            const deltaY = event.clientY - startY;
+            const nextLeft = originLeft + deltaX;
+            const nextTop = originTop + deltaY;
+
+            const maxLeft = window.innerWidth - progressCard.offsetWidth - 8;
+            const maxTop = window.innerHeight - progressCard.offsetHeight - 8;
+
+            progressCard.style.left = `${clamp(nextLeft, 8, maxLeft)}px`;
+            progressCard.style.top = `${clamp(nextTop, 8, maxTop)}px`;
+        };
+
+        const onPointerUp = (event) => {
+            if (!isDragging) return;
+            isDragging = false;
+            progressCard.classList.remove('dragging');
+            progressCard.releasePointerCapture(event.pointerId);
+        };
+
+        progressCard.addEventListener('pointerdown', onPointerDown);
+        progressCard.addEventListener('pointermove', onPointerMove);
+        progressCard.addEventListener('pointerup', onPointerUp);
+        progressCard.addEventListener('pointercancel', onPointerUp);
+    }
+
+    function getProgressTargetNames() {
+        const names = new Set(['Q1']);
+        const q1Value = document.querySelector('input[name="Q1"]:checked')?.value;
+
+        if (q1Value === '否') {
+            return names;
+        }
+
+        document.querySelectorAll('#mainContent input[required]').forEach(input => {
+            names.add(input.name);
+        });
+
+        names.add('Q10');
+        return names;
+    }
+
+    function countAnswered(names) {
+        let count = 0;
+        names.forEach(name => {
+            if (name === 'Q10') {
+                if (document.querySelectorAll('input[name="Q10"]:checked').length > 0) {
+                    count += 1;
+                }
+                return;
+            }
+
+            if (document.querySelector(`input[name="${name}"]:checked`)) {
+                count += 1;
+            }
+        });
+
+        return count;
+    }
+
+    function updateProgressCard() {
+        const names = getProgressTargetNames();
+        const total = names.size;
+        const answered = countAnswered(names);
+        const percent = total === 0 ? 0 : Math.round((answered / total) * 100);
+
+        progressCount.textContent = `${answered}/${total}`;
+        progressPercent.textContent = `${percent}%`;
+        progressBarFill.style.width = `${percent}%`;
+
+        if (answered === 0) {
+            progressTip.textContent = '先完成筛选题，更多内容将展开。';
+        } else if (answered < total) {
+            progressTip.textContent = '再坚持一下，即将完成。';
+        } else {
+            progressTip.textContent = '已完成全部必答题，可提交。';
+        }
+    }
 
     document.querySelectorAll('input[name="Q1"]').forEach(radio => {
         radio.addEventListener('change', function() {
@@ -544,7 +732,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 endCard.classList.add('hidden');
                 submitBtn.textContent = '提交问卷';
             }
+
+            updateProgressCard();
         });
+    });
+
+    document.getElementById('surveyForm').addEventListener('input', function() {
+        updateProgressCard();
     });
 
     // 表单提交处理
@@ -610,11 +804,15 @@ document.addEventListener('DOMContentLoaded', function() {
             mainContent.classList.remove('hidden');
             endCard.classList.add('hidden');
             submitBtn.textContent = '提交问卷';
+            updateProgressCard();
         } catch (err) {
             console.error(err);
             alert('提交失败：' + err.message);
         }
     });
+
+    updateProgressCard();
+    initProgressCardDrag();
 });
 </script>
 
