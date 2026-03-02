@@ -113,7 +113,7 @@ function validatePayload(payload) {
     errors.push('缺少必填字段: Q10（了解途径）');
   }
 
-  // 满意度量表题验证（Q16-Q45）
+  // 满意度量表题验证（Q16-Q36）
   LIKERT_IDS.forEach((id) => {
     const value = Number(payload[id]);
     if (!Number.isFinite(value) || value < 1 || value > 5) {
@@ -121,7 +121,7 @@ function validatePayload(payload) {
     }
   });
 
-  // 行为意向题验证（Q46-Q47）
+  // 行为意向题验证（Q37-Q38）
   INTENT_IDS.forEach((id) => {
     const value = Number(payload[id]);
     if (!Number.isFinite(value) || value < 1 || value > 5) {
